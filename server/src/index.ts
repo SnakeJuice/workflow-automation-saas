@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
@@ -14,12 +14,12 @@ app.use(cors());
 app.use(express.json());
 
 // Healthcheck endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'online', service: 'Event-Driven Workflow Engine' });
 });
 
 // 1. Crear un nuevo Workflow
-app.post('/api/workflows', async (req, res) => {
+app.post('/api/workflows', async (req: Request, res: Response) => {
   try {
     const { name, description, nodes, edges } = req.body;
 
@@ -39,13 +39,14 @@ app.post('/api/workflows', async (req, res) => {
     });
 
     res.status(201).json(workflow);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: errorMessage });
   }
 });
 
 // 2. Obtener lista de Workflows
-app.get('/api/workflows', async (_req, res) => {
+app.get('/api/workflows', async (_req: Request, res: Response) => {
   const workflows = await prisma.workflow.findMany({
     include: { nodes: true, _count: { select: { executions: true } } },
   });
@@ -53,8 +54,9 @@ app.get('/api/workflows', async (_req, res) => {
 });
 
 // 3. Receptor de Webhooks (Disparador de Eventos)
-app.post('/api/webhooks/:workflowId', async (req, res) => {
-  const { workflowId } = req.params;
+app.post('/api/webhooks/:workflowId', async (req: Request, res: Response) => {
+  const rawWorkflowId = req.params.workflowId;
+  const workflowId = Array.isArray(rawWorkflowId) ? rawWorkflowId[0] : rawWorkflowId;
   const payload = req.body;
 
   try {
@@ -86,8 +88,9 @@ app.post('/api/webhooks/:workflowId', async (req, res) => {
       message: 'Evento recibido y encolado para procesamiento.',
       executionId: execution.id,
     });
-  } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    return res.status(500).json({ error: errorMessage });
   }
 });
 
