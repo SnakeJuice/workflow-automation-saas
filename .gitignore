@@ -134,3 +134,21 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# Dependencias y compilación
+node_modules/
+dist/
+
+# Variables de entorno (Secretos)
+.env
+
+# Carpetas generadas por editores e IA
+.claude/
+.agents/
+.windsurf/
+skills-lock.json
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db

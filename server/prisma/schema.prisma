@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Representa un flujo de trabajo configurado por un usuario
+model Workflow {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  nodes      Node[]
+  edges      Edge[]
+  executions Execution[]
+}
+
+// Cada paso/bloque dentro del flujo (ej: Webhook, HTTP Request, Filter)
+model Node {
+  id         String   @id @default(uuid())
+  workflowId String
+  type       String   // 'WEBHOOK', 'HTTP_REQUEST', 'LOG_OUTPUT', etc.
+  label      String
+  config     Json     @default("{}") // Parámetros del nodo (URL, Headers, etc.)
+  positionX  Float
+  positionY  Float
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+// Conexiones entre nodos (de qué nodo a qué nodo fluyen los datos)
+model Edge {
+  id         String @id @default(uuid())
+  workflowId String
+  sourceId   String
+  targetId   String
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
+
+// Historial de ejecuciones registradas por el Worker Engine
+model Execution {
+  id         String    @id @default(uuid())
+  workflowId String
+  status     String    // 'PENDING', 'RUNNING', 'COMPLETED', 'FAILED'
+  triggerData Json     // Payload de entrada recibido
+  logs       Json      // Registro de cada paso ejecutado y respuestas
+  error      String?
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+}
