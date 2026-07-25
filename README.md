@@ -2,11 +2,9 @@
 
 An asynchronous, event-driven workflow automation SaaS platform (*n8n / Zapier style*). Designed with a **distributed and decoupled architecture** utilizing background message queues to guarantee fault tolerance, automatic retries, and non-blocking low-latency response times.
 
-
 <p align="center">
-  <img src="./assets/preview.png" alt="Flow Engine Preview" width="100%" />
+  <img src="./assets/workflow-preview.png" alt="Flow Engine Preview" width="100%" />
 </p>
-
 
 ---
 
@@ -52,10 +50,10 @@ An asynchronous, event-driven workflow automation SaaS platform (*n8n / Zapier s
 
 ## 🚀 Quick Start with Docker Compose
 
-The entire application is containerized and can be launched with a single command.
+The entire application is containerized and can be launched with a single command across any OS (Linux, macOS, Windows).
 
 ### Prerequisites
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+* [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/) installed and running (via Docker Engine, Docker Desktop, or an equivalent container runtime).
 
 ### Deployment:
 ```bash
